@@ -6,7 +6,7 @@
 struct controller
 {
     /* data */
-    Queue* memQueue;
+    Queue** memQueue;
     int totalCycle;
     bool end;
 };
@@ -14,9 +14,9 @@ typedef struct controller Controller;
 Controller* newController(int sz){
     // array of priorityQueue for each mem
     Controller* c = calloc(1,sizeof(Controller));
-    c->memQueue = calloc(sz,sizeof(Queue*));
+    c->memQueue = (Queue**)calloc(sz,sizeof(Queue*));
     for(int i=0;i<sz;i++){
-        c->memQueue[i] = *newQueue(sz);
+        c->memQueue[i] = newQueue(sz);
     }
     c->totalCycle = 0;
     c->end = false;
@@ -25,6 +25,10 @@ Controller* newController(int sz){
 int main()
 {
     Controller* controller = newController(5);
+    insertq(controller->memQueue[0],5,1);
     display(controller->memQueue[0],5);
+    
+    delQueue(&controller->memQueue[0]);
+
 }
 

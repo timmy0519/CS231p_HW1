@@ -1,67 +1,67 @@
 #include "queue.h"
 #include <stdio.h>
 #include <stdlib.h>
-void insertq(Queue q, int size, int item)
+void insertq(Queue* q, int size, int item)
 {
-    if ((q.front == 0 && q.rear == size - 1) || (q.front == q.rear + 1))
+    if ((q->front == 0 && q->rear == size - 1) || (q->front == q->rear + 1))
     {
         printf("queue is full");
         return;
     }
-    else if (q.rear ==  - 1)
+    else if (q->rear ==  - 1)
     {
-        q.rear++;
-        q.front++;
+        q->rear++;
+        q->front++;
     }
-    else if (q.rear == size - 1 && q.front > 0)
+    else if (q->rear == size - 1 && q->front > 0)
     {
-        q.rear = 0;
+        q->rear = 0;
     }
     else
     {
-        q.rear++;
+        q->rear++;
     }
-    q.arr[q.rear] = item;
+    q->arr[q->rear] = item;
 }
 
-void display(Queue q, int size)
+void display(Queue* q, int size)
 {
     int i;
     printf("\n");
-    if (q.front > q.rear)
+    if (q->front > q->rear)
     {
-        for (i = q.front; i < size; i++)
+        for (i = q->front; i < size; i++)
         {
-            printf("%d ", q.arr[i]);
+            printf("%d ", q->arr[i]);
         }
-        for (i = 0; i <= q.rear; i++)
-            printf("%d ", q.arr[i]);
-    }else if(q.front == -1){
+        for (i = 0; i <= q->rear; i++)
+            printf("%d ", q->arr[i]);
+    }else if(q->front == -1){
         printf("The queue is empty");
     }
     else
     {
-        for (i = q.front; i <= q.rear; i++)
-            printf("%d ", q.arr[i]);
+        for (i = q->front; i <= q->rear; i++)
+            printf("%d ", q->arr[i]);
     }
 }
 
-void popq(Queue q, int size)
+void popq(Queue* q, int size)
 {
-    if (q.front ==  - 1)
+    if (q->front ==  - 1)
     {
         printf("Queue is empty ");
     }
-    else if (q.front == q.rear)
+    else if (q->front == q->rear)
     {
-        printf("\n %d deleted", q.arr[q.front]);
-        q.front =  - 1;
-        q.rear =  - 1;
+        printf("\n %d deleted", q->arr[q->front]);
+        q->front =  - 1;
+        q->rear =  - 1;
     }
     else
     {
-        printf("\n %d deleted", q.arr[q.front]);
-        q.front++;
+        printf("\n %d deleted", q->arr[q->front]);
+        q->front++;
     }
 }
 
@@ -72,4 +72,10 @@ Queue* newQueue(int length){
     q->rear = -1;
     q->byteSize = sizeof(int)*length;
     return q;
+}
+void delQueue(Queue **q){
+    free((*q)->arr);
+    // q->byteSize = -1;
+    free(*q);
+    *q = NULL;
 }
