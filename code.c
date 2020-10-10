@@ -2,22 +2,29 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "queue.h"
-Queue queue;
+#include <stdbool.h> 
+struct controller
+{
+    /* data */
+    Queue* memQueue;
+    int totalCycle;
+    bool end;
+};
+typedef struct controller Controller;
+Controller* newController(int sz){
+    // array of priorityQueue for each mem
+    Controller* c = calloc(1,sizeof(Controller));
+    c->memQueue = calloc(sz,sizeof(Queue*));
+    for(int i=0;i<sz;i++){
+        c->memQueue[i] = *newQueue(sz);
+    }
+    c->totalCycle = 0;
+    c->end = false;
 
-Queue* newQueue(int length){
-    Queue* q = malloc(sizeof(Queue));
-    q->arr = malloc(sizeof(int)*length);
-    q->front = -1;
-    q->rear = -1;
-    return q;
 }
-
-
 int main()
 {
-    int size = 5;
-    Queue* q = newQueue(5);
-    insertq(q,5,7);
-    display(q,5);
+    Controller* controller = newController(5);
+    display(controller->memQueue[0],5);
 }
 

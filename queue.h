@@ -7,14 +7,17 @@ struct queue
     int length;
     int front;
     int rear;
+    int byteSize;
 } ;
 typedef struct queue Queue;
 
-void insertq(Queue*, int, int);
+void insertq(Queue, int, int);
 
-void display(Queue*, int );
+void display(Queue, int );
 
-void deleteq(Queue*, int);
+void popq(Queue, int);
 
 Queue* newQueue(int);
+// free memory
+void delQueue(Queue*);
 #endif

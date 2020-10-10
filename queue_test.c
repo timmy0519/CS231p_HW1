@@ -19,13 +19,13 @@ int main(){
             case 1:
                 printf("\nEnter number: ");
                 scanf("%d", &n);
-                insertq(queue, sz,n);
+                insertq(*queue, sz,n);
                 break;
             case 2:
-                deleteq(queue, sz);
+                popq(*queue, sz);
                 break;
             case 3:
-                display(queue, sz);
+                display(*queue, sz);
                 break;
         }
     }while (ch != 0);
