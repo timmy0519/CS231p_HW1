@@ -1,8 +1,8 @@
 #include "queue.h"
-#include <stdio.h>
-#include <stdlib.h>
-void insertq(Queue* q, int size, int item)
+
+void insertq(Queue* q, int item)
 {
+    int size = q->size;
     if ((q->front == 0 && q->rear == size - 1) || (q->front == q->rear + 1))
     {
         printf("queue is full");
@@ -24,8 +24,9 @@ void insertq(Queue* q, int size, int item)
     q->arr[q->rear] = item;
 }
 
-void display(Queue* q, int size)
+void display(Queue* q)
 {
+    int size = q->size;
     int i;
     printf("\n");
     if (q->front > q->rear)
@@ -45,22 +46,26 @@ void display(Queue* q, int size)
             printf("%d ", q->arr[i]);
     }
 }
-
-void popq(Queue* q, int size)
+bool hasNext(Queue *q){
+    if(q->front!=-1) return true;
+    return false;
+}
+void popq(Queue* q)
 {
+    int size = q->size;
     if (q->front ==  - 1)
     {
         printf("Queue is empty ");
     }
     else if (q->front == q->rear)
     {
-        printf("\n %d deleted", q->arr[q->front]);
+        // printf("\n %d deleted", q->arr[q->front]);
         q->front =  - 1;
         q->rear =  - 1;
     }
     else
     {
-        printf("\n %d deleted", q->arr[q->front]);
+        // printf("\n %d deleted", q->arr[q->front]);
         q->front++;
     }
 }
@@ -71,6 +76,7 @@ Queue* newQueue(int length){
     q->front = -1;
     q->rear = -1;
     q->byteSize = sizeof(int)*length;
+    q->size = length;
     return q;
 }
 void delQueue(Queue **q){
