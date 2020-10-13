@@ -5,7 +5,8 @@ void insertq(Queue* q, int item)
     int size = q->size;
     if ((q->front == 0 && q->rear == size - 1) || (q->front == q->rear + 1))
     {
-        printf("queue is full");
+        printf("queue is full to insert %d", item);
+        display(q);
         return;
     }
     else if (q->rear ==  - 1)
@@ -66,7 +67,7 @@ void popq(Queue* q)
     else
     {
         // printf("\n %d deleted", q->arr[q->front]);
-        q->front++;
+        q->front = (q->front+1)%q->size;
     }
 }
 
@@ -80,6 +81,8 @@ Queue* newQueue(int length){
     return q;
 }
 void delQueue(Queue **q){
+    if(*q==NULL) return;
+    
     free((*q)->arr);
     // q->byteSize = -1;
     free(*q);
