@@ -6,10 +6,10 @@
 
 struct processor
 {
-  // int id;
   int access_time;
-  // MemoryMod * prevRequest;
-}
+  int mem_mod_requested;
+  double time_cumulative_avg;
+};
 typedef struct processor Processor;
 
 void incrAccessTime(Processor * p);
@@ -17,11 +17,14 @@ void incrAccessTime(Processor * p);
 int getAccessTime(Processor * p);
 
 /**
- * args: -mSize : number of memory modules
+ * args: -proc  : processor that generates the request
+ *       -mSize : number of memory modules
  *       -d     : the type of distribution to sample from
  *                'u' for uniform distribution sampling
  *                'n' for normal distribution sampling
  */
-int generate_request(int mSize, char d);
+int generate_request(Processor * proc, int mSize, char d);
+
+double calc_time_cumulative_avg(Processor * proc, int curr_cycle);
 
 #endif
