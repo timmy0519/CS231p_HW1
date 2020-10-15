@@ -9,12 +9,16 @@
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
+#ifndef M_PI
+    #define M_PI 3.14159265358979323846
+#endif
+
 
 /**
  * returns a randomly sampled number from a uniform distribution
  * ranged from 0 to 1
  */
-double rand_gen() {
+double sample_unif() {
   // return a uniformly distributed random value
   return ( (double)(rand()) + 1. )/( (double)(RAND_MAX) + 1. );
 }
@@ -22,17 +26,18 @@ double rand_gen() {
 /**
  * returns a randomly sampled number from a normal distribution
  */
-double normalRandom() {
+double sample_norm() {
   // return a normally distributed random value
-  double v1=rand_gen();
-  double v2=rand_gen();
+  double v1=sample_unif();
+  double v2=sample_unif();
   // Box-Muller inverse transform
-  return cos(2*M_PI*v2)*sqrt(-2.*log(v1));
+  return cos(2 * M_PI * v2) * sqrt(-2. * log(v1));
 }
 
 /**
  * CL args: 1) number of times to sample from normal distribution
  */
+/*
 int main(int argc, char * argv[]) {
   // set mean and sd of gaussian distrobution
   // (default mu = 0, sigma = 1 for normal distribution)
@@ -52,11 +57,12 @@ int main(int argc, char * argv[]) {
   for(int i = 0; i < N-1; i++) {
     // multiplying sigma and adding mu shift range/centering 
     // of sampled numbers to desired parameters
-	double x = normalRandom() * sigma + mu;
+	double x = sample_norm() * sigma + mu;
 	printf("%0.4f,\n", x);
   }
-  printf("%0.4f\n", normalRandom() * sigma + mu);
+  printf("%0.4f\n", sample_norm() * sigma + mu);
 
   // terminate
   return 0;
 }
+//*/
