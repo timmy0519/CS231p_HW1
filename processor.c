@@ -27,7 +27,7 @@ int generate_request(Processor * proc, int mSize, char d)
   {
     // generate a normally distributed number within norm(mu=proc->mmr, sd=mSize)
     new_mem_module_req_index = sample_norm()
-                               * mSize                      // set std-dev here
+                               * (mSize / 6)                // set std-dev here
                                + (proc->mem_mod_requested); // set mean here
   }
   else // uniform sampling
