@@ -4,7 +4,9 @@
 #include <stdlib.h>
 #include <stdbool.h> 
 #include <string.h>
-
+#include <time.h>
+#include <math.h>
+#define M_PI 3.14159265358979323846
 //***********FUNC_DECLARACTION****************
 struct queue
 {
@@ -26,14 +28,37 @@ struct controller
     bool end;
 };
 typedef struct controller Controller;
+struct processor
+{
+  int access_time;
+  int mem_mod_requested;
+  double time_cumulative_avg;
+};
+typedef struct processor Processor;
 
-
+Controller* newController(int,int);
 void insertq(Queue*, int);
 void display(Queue*);
 void popq(Queue*);
 Queue* newQueue(int);
 bool hasNext(Queue *q);
 void delQueue(Queue**);
+
+void incrAccessTime(Processor * p);
+int getAccessTime(Processor * p);
+
+double sample_norm();
+double sample_unif();
+/**
+ * args: -proc  : processor that generates the request
+ *       -mSize : number of memory modules
+ *       -d     : the type of distribution to sample from
+ *                'u' for uniform distribution sampling
+ *                'n' for normal distribution sampling
+ */
+int generate_request(Processor * proc, int mSize, char d);
+
+double calc_time_cumulative_avg(Processor * proc, int curr_cycle);
 //************CONTROLLER**************
 Controller* newController(int p,int m){
     // array of priorityQueue for each mem
@@ -65,6 +90,55 @@ void endCycle(Controller* c){
 }
 //************************************
 //*********PROCESSOR****************
+
+void incrAccessTime(Processor * p)
+{
+  (p->access_time)++;
+}
+
+int getAccessTime(Processor * p)
+{
+  return p->access_time;
+}
+
+/**
+ * args: -proc  : processor that generates the request
+ *       -mSize : number of memory modules
+ *       -d     : the type of distribution to sample from
+ *                'u' for uniform distribution sampling
+ *                'n' for normal distribution sampling
+ */
+int generate_request(Processor * proc, int mSize, char d)
+{
+  // return variable
+  int new_mem_module_req_index = 0;
+
+  // decide type of distribution to sample from
+  if(d == 'n') // normal sampling
+  {
+    // generate a normally distributed number within norm(mu=proc->mmr, sd=mSize)
+    new_mem_module_req_index = sample_norm()
+                               * (mSize / 6)                // set std-dev here
+                               + (proc->mem_mod_requested); // set mean here
+  }
+  else // uniform sampling
+  {
+    // generate a uniformly distributed number within [0, mSize]
+    new_mem_module_req_index = sample_unif() * mSize;
+  }
+
+  // return new index within number of memory modules
+  return new_mem_module_req_index % mSize;
+}
+
+double calc_time_cumulative_avg(Processor * proc, int curr_cycle)
+{
+  double proc_AT = (double) getAccessTime(proc);
+  if(proc_AT == 0)
+    return 0;
+  return curr_cycle / proc_AT;
+}
+
 //*********************************
 //***********QUEUE********************
 void insertq(Queue* q, int item)
@@ -156,7 +230,23 @@ void delQueue(Queue **q){
     *q = NULL;
 }
 //**********************************************
+//*******SAMPLE*******************
+double sample_unif() {
+  // return a uniformly distributed random value
+  return ( (double)(rand()) + 1. )/( (double)(RAND_MAX) + 1. );
+}
 
+/**
+ * returns a randomly sampled number from a normal distribution
+ */
+double sample_norm() {
+  // return a normally distributed random value
+  double v1=sample_unif();
+  double v2=sample_unif();
+  // Box-Muller inverse transform
+  return cos(2 * M_PI * v2) * sqrt(-2. * log(v1));
+}
+//******************
 
 
 int main()
