@@ -2,9 +2,20 @@
 #define MAX_CYCLES 10
 #include <stdio.h>
 #include <stdlib.h>
-#include "queue.h"
 #include <stdbool.h> 
 #include <string.h>
+
+//***********FUNC_DECLARACTION****************
+struct queue
+{
+    int *arr;
+    int length;
+    int front;
+    int rear;
+    int byteSize;
+    int size;
+} ;
+typedef struct queue Queue;
 struct controller
 {
     /* data */
@@ -15,6 +26,15 @@ struct controller
     bool end;
 };
 typedef struct controller Controller;
+
+
+void insertq(Queue*, int);
+void display(Queue*);
+void popq(Queue*);
+Queue* newQueue(int);
+bool hasNext(Queue *q);
+void delQueue(Queue**);
+//************CONTROLLER**************
 Controller* newController(int p,int m){
     // array of priorityQueue for each mem
     Controller* c = calloc(1,sizeof(Controller));
@@ -43,6 +63,101 @@ void endCycle(Controller* c){
     c->totalCycle+=1;
     if(c->totalCycle==MAX_CYCLES) c->end = true;
 }
+//************************************
+//*********PROCESSOR****************
+//*********************************
+//***********QUEUE********************
+void insertq(Queue* q, int item)
+{
+    int size = q->size;
+    if ((q->front == 0 && q->rear == size - 1) || (q->front == q->rear + 1))
+    {
+        printf("queue is full to insert %d", item);
+        display(q);
+        return;
+    }
+    else if (q->rear ==  - 1)
+    {
+        q->rear++;
+        q->front++;
+    }
+    else if (q->rear == size - 1 && q->front > 0)
+    {
+        q->rear = 0;
+    }
+    else
+    {
+        q->rear++;
+    }
+    q->arr[q->rear] = item;
+}
+
+void display(Queue* q)
+{
+    int size = q->size;
+    int i;
+    printf("\n");
+    if (q->front > q->rear)
+    {
+        for (i = q->front; i < size; i++)
+        {
+            printf("%d ", q->arr[i]);
+        }
+        for (i = 0; i <= q->rear; i++)
+            printf("%d ", q->arr[i]);
+    }else if(q->front == -1){
+        printf("The queue is empty");
+    }
+    else
+    {
+        for (i = q->front; i <= q->rear; i++)
+            printf("%d ", q->arr[i]);
+    }
+}
+bool hasNext(Queue *q){
+    if(q->front!=-1) return true;
+    return false;
+}
+void popq(Queue* q)
+{
+    int size = q->size;
+    if (q->front ==  - 1)
+    {
+        printf("Queue is empty ");
+    }
+    else if (q->front == q->rear)
+    {
+        // printf("\n %d deleted", q->arr[q->front]);
+        q->front =  - 1;
+        q->rear =  - 1;
+    }
+    else
+    {
+        // printf("\n %d deleted", q->arr[q->front]);
+        q->front = (q->front+1)%q->size;
+    }
+}
+
+Queue* newQueue(int length){
+    Queue* q = calloc(1,sizeof(Queue));
+    q->arr = calloc(length,sizeof(int));
+    q->front = -1;
+    q->rear = -1;
+    q->byteSize = sizeof(int)*length;
+    q->size = length;
+    return q;
+}
+void delQueue(Queue **q){
+    if(*q==NULL) return;
+    
+    free((*q)->arr);
+    // q->byteSize = -1;
+    free(*q);
+    *q = NULL;
+}
+//**********************************************
+
+
 
 int main()
 {
