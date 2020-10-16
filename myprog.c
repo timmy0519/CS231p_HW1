@@ -8,7 +8,7 @@
 #define M_PI 3.14159265358979323846
 #endif
 #define N_ARGS 2
-#define MAX_M 64
+#define MAX_M 2048
 #define MAX_CYCLES 1000000
 
 /**
