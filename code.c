@@ -251,26 +251,19 @@ double sample_norm() {
 
 int main()
 {
-    int pSize=0,mSize = 0;
+    int pSize=1,mSize = 1;
     Controller* controller = NULL;
     bool endSimulation = false;
+    FILE* fp;
+    char fileName[80];
+    sprintf(fileName,"p_%d_curve.txt",pSize);
+    fp = fopen(fileName,"w");
     while (!endSimulation)
     {
         printf("SETUP\n");
         delController(&controller);
            //setup stage------------------------
-        
-        if(mSize>=2048){
-            mSize = 1;
-            if(pSize>=64){
-                endSimulation = true;
-                break;
-            }
-            else    pSize<<=1;
-        }else{
-            mSize+=1;
-            if(pSize==0)    pSize = 1;
-        }
+
 
         // bool memory[mSize];
         // memset(memory,0,sizeof(memory));
@@ -320,8 +313,29 @@ int main()
             //endcycle stage---
             endCycle(controller);
         }
+
         printf("Finished at %d cycle: %d processors, %d mem, uniform distribution\n",
         controller->totalCycle, pSize, mSize);
+
+        fprintf(fp,"%d, %d\n",mSize,controller->totalCycle);
+        if(mSize>=2048){
+
+            //one file per different p parameter
+            fclose(fp);
+            //
+            mSize = 1;
+            if(pSize>=64){
+                endSimulation = true;
+                break;
+            }
+            else    pSize<<=1;
+            //open new file
+            sprintf(fileName,"p_%d_curve.txt",pSize);
+            fp = fopen(fileName,"w");
+        }else{
+            mSize+=1;
+
+        }
     }
     printf("Finish whole simulation");
 }
