@@ -1,5 +1,5 @@
 /*static circular queue*/
-#define MAX_CYCLES 100
+#define MAX_CYCLES 500
 #define TOLERANCE 0.001
 #include <stdio.h>
 #include <stdlib.h>
@@ -97,9 +97,9 @@ void endCycle(Controller* c,double avg){
     c->totalCycle+=1;
     if(c->totalCycle==MAX_CYCLES) c->end = true;
     double tolerance = TOLERANCE* c->time_cumulative_avg;
-    // if(c->time_cumulative_avg>avg && c->time_cumulative_avg>avg<= tolerance ||
-    //  c->time_cumulative_avg<=avg && c->time_cumulative_avg-avg >= -tolerance)
-    //     c->end = true;
+    if(c->time_cumulative_avg>avg && c->time_cumulative_avg>avg<= tolerance ||
+     c->time_cumulative_avg<=avg && c->time_cumulative_avg-avg >= -tolerance)
+        c->end = true;
     c->time_cumulative_avg = avg;
 }
 //************************************
@@ -347,6 +347,7 @@ int main(int argc,char *argv[])
         for (int i = 0; i < pSize; i++)
         {
             //put processor[i]'s request on queue
+            processors[i]->mem_mod_requested = rand()%mSize;
             int request = generate_request(processors[i],mSize,distribution);
             insertq(controller->memQueue[request],i);
         }
@@ -377,6 +378,7 @@ int main(int argc,char *argv[])
                 
                 int nP = curQ->arr[curQ->front]; //next processor's index
                 int nP_request = generate_request(processors[nP],mSize,distribution);
+               
                 decAccessTime(processors[nP]);
                 processors[nP]->time_cumulative_avg = calc_time_cumulative_avg(processors[nP],controller->totalCycle);
                 popq(curQ);
@@ -394,7 +396,7 @@ int main(int argc,char *argv[])
 
         printf("Finished at %d cycle: %d processors, %d mem, u, avg: %lf\n",
         controller->totalCycle, pSize, mSize,controller->time_cumulative_avg);
-
+        
         fprintf(fp,"%lf,\n",controller->time_cumulative_avg);
         if(mSize>=2048){
 
