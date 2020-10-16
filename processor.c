@@ -1,13 +1,24 @@
 #include "processor.h"
+#include "dist_sampling.h"
 
 void incrAccessTime(Processor * p)
 {
   (p->access_time)++;
 }
 
+void incrAccessCounter(Processor * p)
+{
+  (p->access_counter)++;
+}
+
 int getAccessTime(Processor * p)
 {
   return p->access_time;
+}
+
+int getAccessCounter(Processor * p)
+{
+  return p->access_counter;
 }
 
 /**
@@ -37,13 +48,17 @@ int generate_request(Processor * proc, int mSize, char d)
   }
 
   // return new index within number of memory modules
+  if(new_mem_module_req_index < 0)
+  {
+    new_mem_module_req_index = mSize + new_mem_module_req_index;
+  }
   return new_mem_module_req_index % mSize;
 }
 
 double calc_time_cumulative_avg(Processor * proc, int curr_cycle)
 {
-  double proc_AT = (double) getAccessTime(proc);
-  if(proc_AT == 0)
+  double proc_AC = (double) getAccessCounter(proc);
+  if(proc_AC == 0)
     return 0;
-  return curr_cycle / proc_AT;
+  return curr_cycle / proc_AC;
 }

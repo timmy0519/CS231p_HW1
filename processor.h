@@ -7,6 +7,7 @@
 struct processor
 {
   int access_time;
+  int access_counter;
   int mem_mod_requested;
   double time_cumulative_avg;
 };
@@ -15,6 +16,10 @@ typedef struct processor Processor;
 void incrAccessTime(Processor * p);
 
 int getAccessTime(Processor * p);
+
+void incrAccessCounter(Processor * p);
+
+int getAccessCounter(Processor * p);
 
 /**
  * args: -proc  : processor that generates the request
