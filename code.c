@@ -97,9 +97,9 @@ void endCycle(Controller* c,double avg){
     c->totalCycle+=1;
     if(c->totalCycle==MAX_CYCLES) c->end = true;
     double tolerance = TOLERANCE* c->time_cumulative_avg;
-    if(c->time_cumulative_avg>avg && c->time_cumulative_avg>avg<= tolerance ||
-     c->time_cumulative_avg<=avg && c->time_cumulative_avg-avg >= -tolerance)
-        c->end = true;
+    // if(c->time_cumulative_avg>avg && c->time_cumulative_avg>avg<= tolerance ||
+    //  c->time_cumulative_avg<=avg && c->time_cumulative_avg-avg >= -tolerance)
+    //     c->end = true;
     c->time_cumulative_avg = avg;
 }
 //************************************
