@@ -31,6 +31,7 @@ typedef struct controller Controller;
 struct processor
 {
   int access_time;
+  int access_counter;
   int mem_mod_requested;
   double time_cumulative_avg;
 };
@@ -44,8 +45,11 @@ Queue* newQueue(int);
 bool hasNext(Queue *q);
 void delQueue(Queue**);
 
+void zeroOutProcessor(Processor * proc);
 void incrAccessTime(Processor * p);
 int getAccessTime(Processor * p);
+void incrAccessCounter(Processor * p);
+int getAccessCounter(Processor * p);
 
 double sample_norm();
 double sample_unif();
@@ -91,14 +95,32 @@ void endCycle(Controller* c){
 //************************************
 //*********PROCESSOR****************
 
+void zeroOutProcessor(Processor * proc)
+{
+  proc->access_time = 0;
+  proc->access_counter = 0;
+  proc->mem_mod_requested = 0;
+  proc->time_cumulative_avg = 0.0;
+}
+
 void incrAccessTime(Processor * p)
 {
   (p->access_time)++;
 }
 
+void incrAccessCounter(Processor * p)
+{
+  (p->access_counter)++;
+}
+
 int getAccessTime(Processor * p)
 {
   return p->access_time;
+}
+
+int getAccessCounter(Processor * p)
+{
+  return p->access_counter;
 }
 
 /**
@@ -128,15 +150,19 @@ int generate_request(Processor * proc, int mSize, char d)
   }
 
   // return new index within number of memory modules
+  if(new_mem_module_req_index < 0)
+  {
+    new_mem_module_req_index = mSize + new_mem_module_req_index;
+  }
   return new_mem_module_req_index % mSize;
 }
 
 double calc_time_cumulative_avg(Processor * proc, int curr_cycle)
 {
-  double proc_AT = (double) getAccessTime(proc);
-  if(proc_AT == 0)
+  double proc_AC = (double) getAccessCounter(proc);
+  if(proc_AC == 0)
     return 0;
-  return curr_cycle / proc_AT;
+  return curr_cycle / proc_AC;
 }
 
 //*********************************
@@ -249,8 +275,12 @@ double sample_norm() {
 //******************
 
 
-int main()
+int main(int argc, char * argv[])
 {
+    // expected number of arguments
+    if(argc != N_ARGS + 1)
+      return -1;
+
     int pSize=1,mSize = 1;
     Controller* controller = NULL;
     bool endSimulation = false;
@@ -258,23 +288,39 @@ int main()
     char fileName[80];
     sprintf(fileName,"p_%d_curve.txt",pSize);
     fp = fopen(fileName,"w");
+
+    // init variables with command line arguements
+    pSize = atoi(argv[1]);
+    char dist_type = argv[2][0];
+
+    // main loop
     while (!endSimulation)
     {
         printf("SETUP\n");
         delController(&controller);
-           //setup stage------------------------
+        //setup stage------------------------
 
-
-        // bool memory[mSize];
-        // memset(memory,0,sizeof(memory));
+        // init array of memory modules "taken" status
+        bool memory[mSize];
+        memset(memory,0,sizeof(memory)); // zero out array
+        // init controller
         controller = newController(pSize,mSize);
-        // Todo: put request on memQueue first
-        // priority: starts from smaller index 0->p
+        // initialize array of processor structs
+        Processor processors[pSize];
+        for(int i = 0; i < pSize; i++)
+        {
+          zeroOutProcessor(processors + i);
+          // if using normal distribution workload, then set mu_pi
+          if(dist_type == 'n')
+          {
+            processor[i].mem_mod_requested = generate_request(processor + i, mSize, 'u');
+          }
+        }
 
         for (int i = 0; i < pSize; i++)
         {
             //put processor[i]'s request on queue
-            int request = rand()%mSize;
+            int request = generate_request(processor + i, mSize, dist_type);
             insertq(controller->memQueue[request],i);
         }
         //---------------
@@ -290,7 +336,8 @@ int main()
                 //Todo:
                 //process first request and update the metadata(average access time) inside processor
                 //don't generate next request -> avoid same processor accesses more than one mem
-                
+                int proc_m_request_indx = curQ->arr[m]; // TODO: left off here
+                popq(curQ);
             }
             //-------
             
@@ -301,7 +348,7 @@ int main()
                 if(!hasNext(curQ)) continue;
 
                 int nP = curQ->arr[curQ->front]; //next processor's index
-                int nP_request = rand()%mSize;; //generate new request 
+                int nP_request = generate_request(processor + nP, mSize, dist_type); //generate new request 
                 // //debug
                 // printf("%d accessed memory[%d]\n",nP,m);
                 // //
@@ -314,16 +361,19 @@ int main()
             endCycle(controller);
         }
 
-        printf("Finished at %d cycle: %d processors, %d mem, uniform distribution\n",
-        controller->totalCycle, pSize, mSize);
+        printf("Finished at %d cycle: %d processors, %d mem, %c distribution\n",
+        controller->totalCycle, pSize, mSize, dist_type);
 
         fprintf(fp,"%d, %d\n",mSize,controller->totalCycle);
+
+        // check if we finished simulating m = [0, 2048]
         if(mSize>=2048){
 
             //one file per different p parameter
             fclose(fp);
             //
             mSize = 1;
+            // check if we finished simulating p = [2, 4, 8, 16, 32, 64]
             if(pSize>=64){
                 endSimulation = true;
                 break;
@@ -334,7 +384,6 @@ int main()
             fp = fopen(fileName,"w");
         }else{
             mSize+=1;
-
         }
     }
     printf("Finish whole simulation");
