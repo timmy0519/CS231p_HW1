@@ -306,7 +306,7 @@ int main(int argc,char *argv[])
     bool endSimulation = false;
     FILE* fp;
     char fileName[80];
-    sprintf(fileName,"p_%d_u.txt",pSize);
+    sprintf(fileName,"p_%d_%c.txt",pSize,distribution);
     fp = fopen(fileName,"w");
 
     Processor** processors = (Processor**)malloc(sizeof(Processor*)*pSize);
@@ -395,7 +395,7 @@ int main(int argc,char *argv[])
         printf("Finished at %d cycle: %d processors, %d mem, u, avg: %lf\n",
         controller->totalCycle, pSize, mSize,controller->time_cumulative_avg);
 
-        fprintf(fp,"%lf, %d\n",controller->time_cumulative_avg,controller->mSize);
+        fprintf(fp,"%lf,\n",controller->time_cumulative_avg);
         if(mSize>=2048){
 
             //one file per different p parameter
