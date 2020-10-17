@@ -302,7 +302,7 @@ int main(int argc,char *argv[])
     int pSize=1,mSize = 1;
     if(argc>1){
         pSize = atoi(argv[1]);
-        distribution = argv[1][0];
+        distribution = argv[2][0];
     }
         
 
@@ -400,6 +400,7 @@ int main(int argc,char *argv[])
         }
 
         printf("%.4f\n",controller->time_cumulative_avg);
+        // printf("%d_%c\n",pSize,distribution);
         // controller->totalCycle, pSize, mSize,controller->time_cumulative_avg);
         
         // fprintf(fp,"%lf,\n",controller->time_cumulative_avg);
