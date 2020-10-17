@@ -423,6 +423,6 @@ int main(int argc,char *argv[])
             mSize+=1;
         }
     }
-    printf("Finish whole simulation");
+    // printf("Finish whole simulation");
 }
 
