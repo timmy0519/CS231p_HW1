@@ -299,17 +299,21 @@ int main(int argc,char *argv[])
 {
     // default distribution is normal
     char distribution = 'n';
-    if(argc>1)
-        distribution = argv[1][0];
-
-
     int pSize=1,mSize = 1;
+    if(argc>1){
+        pSize = atoi(argv[1]);
+        distribution = argv[1][0];
+    }
+        
+
+
+    
     Controller* controller = NULL;
     bool endSimulation = false;
-    FILE* fp;
-    char fileName[80];
-    sprintf(fileName,"p_%d_%c.txt",pSize,distribution);
-    fp = fopen(fileName,"w");
+    // FILE* fp;
+    // char fileName[80];
+    // sprintf(fileName,"p_%d_%c.txt",pSize,distribution);
+    // fp = fopen(fileName,"w");
 
     Processor** processors = (Processor**)malloc(sizeof(Processor*)*pSize);
     for(int i=0;i<pSize;i++){
@@ -395,24 +399,25 @@ int main(int argc,char *argv[])
             endCycle(controller,cur_avg);
         }
 
-        // printf("Finished at %d cycle: %d processors, %d mem, u, avg: %lf\n",
+        printf("%.4f\n",controller->time_cumulative_avg);
         // controller->totalCycle, pSize, mSize,controller->time_cumulative_avg);
         
-        fprintf(fp,"%lf,\n",controller->time_cumulative_avg);
+        // fprintf(fp,"%lf,\n",controller->time_cumulative_avg);
         if(mSize>=2048){
 
             //one file per different p parameter
-            fclose(fp);
+            // fclose(fp);
             //
             mSize = 1;
-            if(pSize>=64){
-                endSimulation = true;
-                break;
-            }
-            else    pSize<<=1;
+            endSimulation = true;
+            // if(pSize>=64){
+            //     endSimulation = true;
+            //     break;
+            // }
+            // else    pSize<<=1;
             //open new file
-            sprintf(fileName,"p_%d_%c.txt",pSize,distribution);
-            fp = fopen(fileName,"w");
+            // sprintf(fileName,"p_%d_%c.txt",pSize,distribution);
+            // fp = fopen(fileName,"w");
         }else{
             mSize+=1;
         }
