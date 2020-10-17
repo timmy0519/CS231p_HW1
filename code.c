@@ -1,6 +1,6 @@
 /*static circular queue*/
-#define MAX_CYCLES 500
-#define TOLERANCE 0.001
+#define MAX_CYCLES 1000000
+#define TOLERANCE 0.0001
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h> 
@@ -423,6 +423,6 @@ int main(int argc,char *argv[])
             mSize+=1;
         }
     }
-    printf("Finish whole simulation");
+    //printf("Finish whole simulation");
 }
 
