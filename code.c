@@ -297,10 +297,12 @@ double sample_norm() {
 
 int main(int argc,char *argv[])
 {
-    
+    // default distribution is normal
     char distribution = 'n';
     if(argc>1)
         distribution = argv[1][0];
+
+
     int pSize=1,mSize = 1;
     Controller* controller = NULL;
     bool endSimulation = false;
@@ -316,7 +318,6 @@ int main(int argc,char *argv[])
 
     while (!endSimulation)
     {
-        // printf("SETUP\n");
         delController(&controller);
            //setup stage------------------------
         if(mSize==1){
@@ -339,9 +340,7 @@ int main(int argc,char *argv[])
         
         controller = newController(pSize,mSize);
 
-        // remember to del processor
-
-        // Todo: put request on memQueue first
+        // put request on memQueue first
         // priority: starts from smaller index 0->p
 
         for (int i = 0; i < pSize; i++)
@@ -352,7 +351,6 @@ int main(int argc,char *argv[])
             insertq(controller->memQueue[request],i);
         }
         //---------------
-        // printf("CYCLE start\n");
         // cycle start
         while(!controller->end){
 
@@ -361,17 +359,22 @@ int main(int argc,char *argv[])
                 Queue* curQ = controller->memQueue[m];
                 if(!hasNext(curQ))   continue; 
                 
-                //Todo:
+
                 //process first request and update the metadata(average access time) inside processor
                 //don't generate next request -> avoid same processor accesses more than one mem
                 int nP = curQ->arr[curQ->front];
                 incrAccessCounter(processors[nP]);
-                incrAccessTime(processors[nP]);
             }
             //-------
-            
-            //printf("Generating request...\n");
+
+            // increase the access time of all processor
+            // decrease it back later if the processor is currently accessing mem
+            for (int i = 0; i < pSize; i++)
+                incrAccessTime(processors[i]);
+
+
             //generating request stage
+            //push processor's next request on Queue
             for(int m=0;m<mSize;m++){
                 Queue* curQ = controller->memQueue[m];
                 if(!hasNext(curQ)) continue;
@@ -389,13 +392,11 @@ int main(int argc,char *argv[])
             
             //endcycle stage---
             double cur_avg = calc_all_time_cumulative_avg(controller,processors);
-            
             endCycle(controller,cur_avg);
-            //printf("End cycle...\n");
         }
 
-        printf("Finished at %d cycle: %d processors, %d mem, u, avg: %lf\n",
-        controller->totalCycle, pSize, mSize,controller->time_cumulative_avg);
+        // printf("Finished at %d cycle: %d processors, %d mem, u, avg: %lf\n",
+        // controller->totalCycle, pSize, mSize,controller->time_cumulative_avg);
         
         fprintf(fp,"%lf,\n",controller->time_cumulative_avg);
         if(mSize>=2048){
